@@ -1,0 +1,7 @@
+## Interface: 80102
+## Title: Chat LFG
+## Author: raegen
+## Version: 0.3
+
+main.lua
+ui.xml
