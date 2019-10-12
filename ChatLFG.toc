@@ -2,6 +2,7 @@
 ## Title: Chat LFG
 ## Author: raegen
 ## Version: 0.3
+## SavedVariablesPerCharacter: ChatLFGRole
 
 main.lua
 ui.xml

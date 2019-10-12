@@ -14,41 +14,71 @@ local ROLE = {
     DPS = 'DPS',
     HEALER = 'Healer'
 };
+local TYPE = {
+    LFM = "[lL][fF]%d?[mM]",
+    LFG = "[lL][fF][gG]",
+    DPS = "[dD][pP][sS]",
+    TANK = "[tT][aA][nN][kK]",
+    HEALER = "[hH][eE][aA][lL][eE]?[rR]?"
+}
+local COLOR = {
+    RED = "FFFF8080",
+    GREEN = "FF33DA33",
+    YELLOW = "FFFAFA99",
+    BLUE = "FF8080FF"
+}
+
+function c(string, color)
+    return "|c"..color..string.."|r";
+end
+
+local PREFIX = c("[Chat LFG]:", COLOR.YELLOW);
 
 local localizedClass, englishClass, classIndex = UnitClass("player");
-local role = nil;
 
 local filter = "";
 SLASH_CLFG1 = "/clfg"
 SlashCmdList["CLFG"] = function(msg)
     local _, _, cmd, arg = string.find(msg, "%s?(%w+)%s?(.*)");
     if (cmd == COMMAND.FILTER) then
+        if (ChatLFGRole == nil) then
+            print(PREFIX, c("[ERROR]", COLOR.RED), c("Role not set. Please set your role with '/clfg role Tank/DPS/Healer' then try again.", COLOR.RED));
+            return
+        end
         filter = arg;
         if (filter ~= "") then
             JoinChannelByName(CHANNEL.LOOKING_FOR_GROUP);
             JoinChannelByName(CHANNEL.WORLD);
-            print('Chat LFG:', 'Group search started for "'..filter..'"');
+            print(PREFIX, c('Group search started for "'..filter..'"', COLOR.YELLOW));
         else
             LeaveChannelByName(CHANNEL.LOOKING_FOR_GROUP);
             LeaveChannelByName(CHANNEL.WORLD);
-            print('Chat LFG:', 'Group search stopped.');
+            print(PREFIX, c('Group search stopped.', COLOR.YELLOW));
         end
     elseif (cmd == COMMAND.ROLE) then
         if (ROLE[arg:upper()]) then
-            role = arg:upper();
-            print('Chat LFG:', 'Role set to '..role);
-        else
-            role = nil;
-            print('Chat LFG:', 'Role unset.');
+            ChatLFGRole = arg:upper();
+            print(PREFIX, c('Role set to '..ChatLFGRole, COLOR.YELLOW));
         end
     end
 end 
 
-frame:RegisterEvent("CHAT_MSG_CHANNEL")
-frame:SetScript("OnEvent", function(self, event, message, author, c, d, e, f, g, h, channel)
+frame:RegisterEvent("CHAT_MSG_CHANNEL");
+frame:SetScript("OnEvent", function(self, event, message, author, _, _, _, _, _, _, channel)
     if (channel == CHANNEL.LOOKING_FOR_GROUP or channel == CHANNEL.WORLD or channel == CHANNEL.GENERAL) then
         if (filter ~= "" and string.find(message:lower(), filter:lower())) then
-            print("|cFF0EC4DB|Hplayer:"..author.."|h["..author.."]|h", message);
+            local type = "";
+            if (message:find(TYPE.LFM)) then
+                type = c("[LFM]", COLOR.GREEN);
+            elseif (message:find(TYPE.LFG)) then
+                type = c("[LFG]", COLOR.BLUE);
+            end
+            message = message:gsub(TYPE.DPS, c(ROLE.DPS, COLOR.RED).."|c"..COLOR.YELLOW);
+            message = message:gsub(TYPE.TANK, c(ROLE.TANK, COLOR.BLUE).."|c"..COLOR.YELLOW);
+            message = message:gsub(TYPE.HEALER, c(ROLE.HEALER, COLOR.GREEN).."|c"..COLOR.YELLOW);
+            message = c(message, COLOR.YELLOW);
+
+            print(PREFIX, type, c("|Hplayer:"..author.."|h["..author.."]|h", COLOR.YELLOW), message);
         end
     end
 end)
@@ -90,14 +120,10 @@ function LFG_SignUp_Setup(level, value, dropDownFrame, anchorName, xOffset, yOff
             if (button:GetText() == UnitPopupButtons["LFG_SIGNUP"].text) then
                 -- Make it invite the player that this menu popped up for (button at index 1)
                 button.func = function()
-                    if (role == nil) then
-                        print("Role not set. Please set your role with '/clfg role Tank/DPS/Healer' then try again.");
-                        return
-                    end
                     local player = _G[buttonPrefix.."1"]:GetText();
                     local message = "";
                     local level = UnitLevel("player");
-                    message = message..role;
+                    message = message..ChatLFGRole;
                     if (level ~= 60) then
                         message = message.." ("..UnitLevel("player").." "..localizedClass..") here.";
                     else
