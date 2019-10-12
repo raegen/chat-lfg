@@ -27,13 +27,11 @@ SlashCmdList["CLFG"] = function(msg)
         if (filter ~= "") then
             JoinChannelByName(CHANNEL.LOOKING_FOR_GROUP);
             JoinChannelByName(CHANNEL.WORLD);
-            JoinChannelByName(CHANNEL.GENERAL);
-            print('Chat LFG:', 'Group search term set to "'..filter..'"');
+            print('Chat LFG:', 'Group search started for "'..filter..'"');
         else
             LeaveChannelByName(CHANNEL.LOOKING_FOR_GROUP);
             LeaveChannelByName(CHANNEL.WORLD);
-            LeaveChannelByName(CHANNEL.GENERAL);
-            print('Chat LFG:', 'Group search term unset.');
+            print('Chat LFG:', 'Group search stopped.');
         end
     elseif (cmd == COMMAND.ROLE) then
         if (ROLE[arg:upper()]) then
