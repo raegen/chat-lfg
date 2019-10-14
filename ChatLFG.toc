@@ -1,8 +1,7 @@
 ## Interface: 80102
 ## Title: Chat LFG
 ## Author: raegen
-## Version: 0.3
+## Version: @project-version@
 ## SavedVariablesPerCharacter: ChatLFGRole
 
 main.lua
-ui.xml
