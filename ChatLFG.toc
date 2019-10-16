@@ -2,6 +2,6 @@
 ## Title: Chat LFG
 ## Author: raegen
 ## Version: @project-version@
-## SavedVariablesPerCharacter: ChatLFGRole
+## SavedVariablesPerCharacter: ChatLFGRoles
 
 main.lua
